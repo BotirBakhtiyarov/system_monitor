@@ -17,8 +17,8 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <notebook> <!-- Add this notebook wrapper -->
-                        <page string="Basic Info"> <!-- First tab -->
+                    <notebook>
+                        <page string="Basic Info">
                             <group>
                                 <field name="name"/>
                                 <field name="username"/>
@@ -27,7 +27,6 @@
                         </page>
                         <page string="Metrics History">
                             <field name="metric_ids" search_view_id="view_system_metric_search">>
-                                <!-- Existing tree and graph views -->
                                 <tree>
                                     <field name="timestamp"/>
                                     <field name="cpu_percent"/>
@@ -49,7 +48,7 @@
             <kanban decoration-danger="latest_cpu > 80" decoration-warning="latest_cpu > 50" decoration-success="latest_cpu &lt;= 50">
                 <field name="latest_cpu"/>
                 <field name="latest_ram"/>
-                <field name="is_active"/>  <!-- Add this line -->
+                <field name="is_active"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">

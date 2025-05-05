@@ -1,6 +1,5 @@
 from odoo import models, fields, api
 
-
 class Computer(models.Model):
     _name = 'system.monitor.computer'
     _description = 'Monitored Computer'
@@ -30,7 +29,6 @@ class Computer(models.Model):
             computer.latest_cpu = latest_metric.cpu_percent or 0.0
             computer.latest_ram = latest_metric.ram_percent or 0.0
 
-
 class SystemMetric(models.Model):
     _name = 'system.monitor.metric'
     _description = 'System Metrics'
@@ -43,7 +41,6 @@ class SystemMetric(models.Model):
     ram_used = fields.Float(string='Used RAM (MB)')
     ram_percent = fields.Float(string='RAM %', digits=(5, 2))
     app_ids = fields.One2many('system.monitor.app', 'metric_id', string='Applications')
-
 
 class ApplicationUsage(models.Model):
     _name = 'system.monitor.app'
