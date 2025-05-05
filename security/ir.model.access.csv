@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_system_monitor_computer,system.monitor.computer,model_system_monitor_computer,base.group_user,1,1,1,1
+access_system_monitor_metric,system.monitor.metric,model_system_monitor_metric,base.group_user,1,1,1,1
+access_system_monitor_app,system.monitor.app,model_system_monitor_app,base.group_user,1,1,1,1

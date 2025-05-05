@@ -1,0 +1,106 @@
+<odoo>
+    <record id="view_system_metric_tree" model="ir.ui.view">
+        <field name="name">system.metric.tree</field>
+        <field name="model">system.monitor.metric</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="timestamp"/>
+                <field name="cpu_percent"/>
+                <field name="ram_percent"/>
+                <field name="ram_used"/>
+                <field name="ram_total"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_system_metric_form" model="ir.ui.view">
+        <field name="name">system.metric.form</field>
+        <field name="model">system.monitor.metric</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="computer_id"/>
+                        <field name="timestamp"/>
+                        <field name="cpu_percent"/>
+                        <field name="ram_percent"/>
+                        <field name="ram_used"/>
+                        <field name="ram_total"/>
+                    </group>
+                    <field name="app_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="duration"/>
+                            <field name="cpu_usage"/>
+                            <field name="ram_usage"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_system_metric_search" model="ir.ui.view">
+        <field name="name">system.metric.search</field>
+        <field name="model">system.monitor.metric</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="last_5m" string="Last 5 Minutes"
+                    domain="[('timestamp', '>=', (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="last_1h" string="Last 1 Hour"
+                    domain="[('timestamp', '>=', (datetime.datetime.now() - datetime.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="last_24h" string="Last 24 Hours"
+                    domain="[('timestamp', '>=', (datetime.datetime.now() - datetime.timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="last_7d" string="Last 7 Days"
+                    domain="[('timestamp', '>=', (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_system_metric_graph" model="ir.ui.view">
+        <field name="name">system.metric.graph</field>
+        <field name="model">system.monitor.metric</field>
+        <field name="arch" type="xml">
+            <graph type="line">
+                <field name="timestamp" type="row"/>
+                <field name="cpu_percent" type="measure"/>
+                <field name="ram_percent" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_app_pie" model="ir.ui.view">
+        <field name="name">app.pie</field>
+        <field name="model">system.monitor.app</field>
+        <field name="arch" type="xml">
+            <graph type="pie">
+                <field name="name" type="row"/>
+                <field name="cpu_usage" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_system_metrics" model="ir.actions.act_window">
+        <field name="name">System Metrics</field>
+        <field name="res_model">system.monitor.metric</field>
+        <field name="view_mode">tree,form,graph,pivot</field>
+    </record>
+
+    <record id="view_system_metric_embedded_graph" model="ir.ui.view">
+        <field name="name">system.metric.embedded.graph</field>
+        <field name="model">system.monitor.metric</field>
+        <field name="arch" type="xml">
+            <graph type="line">
+                <field name="timestamp" type="row"/>
+                <field name="cpu_percent" type="measure"/>
+                <field name="ram_percent" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <menuitem id="menu_system_metrics"
+              name="Metrics"
+              parent="menu_system_monitor"
+              action="action_system_metrics"
+              sequence="20"/>
+</odoo>
