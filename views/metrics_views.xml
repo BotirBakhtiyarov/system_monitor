@@ -49,6 +49,8 @@
                     domain="[('timestamp', '>=', (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
                 <filter name="last_1h" string="Last 1 Hour"
                     domain="[('timestamp', '>=', (datetime.datetime.now() - datetime.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="last_3h" string="Last 3 Hours"
+                    domain="[('timestamp', '>=', (datetime.datetime.now() - datetime.timedelta(hours=3)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
                 <filter name="last_24h" string="Last 24 Hours"
                     domain="[('timestamp', '>=', (datetime.datetime.now() - datetime.timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
                 <filter name="last_7d" string="Last 7 Days"

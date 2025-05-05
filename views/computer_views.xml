@@ -7,7 +7,6 @@
                 <field name="name"/>
                 <field name="username"/>
                 <field name="last_seen"/>
-                <field name="active"/>
             </tree>
         </field>
     </record>
@@ -24,12 +23,11 @@
                                 <field name="name"/>
                                 <field name="username"/>
                                 <field name="last_seen"/>
-                                <field name="active"/>
                             </group>
                         </page>
                         <page string="Metrics History">
-                            <field name="metric_ids">
-                                <!-- Add explicit model context -->
+                            <field name="metric_ids" search_view_id="view_system_metric_search">>
+                                <!-- Existing tree and graph views -->
                                 <tree>
                                     <field name="timestamp"/>
                                     <field name="cpu_percent"/>
@@ -51,12 +49,15 @@
             <kanban decoration-danger="latest_cpu > 80" decoration-warning="latest_cpu > 50" decoration-success="latest_cpu &lt;= 50">
                 <field name="latest_cpu"/>
                 <field name="latest_ram"/>
+                <field name="is_active"/>  <!-- Add this line -->
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
                             <div class="oe_kanban_content">
                                 <div class="oe_kanban_header">
                                     <b><field name="name"/></b>
+                                    <span t-if="record.is_active.raw_value" style="color: green; margin-left: 5px;">●</span>
+                                    <span t-else="" style="color: red; margin-left: 5px;">●</span>
                                 </div>
                                 <div>User: <field name="username"/></div>
                                 <div>Last Seen: <field name="last_seen"/></div>

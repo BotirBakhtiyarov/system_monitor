@@ -7,12 +7,21 @@ class Computer(models.Model):
 
     name = fields.Char(string='Computer ID', required=True)
     username = fields.Char(string='Username')
-    active = fields.Boolean(string='Active', default=True)
     last_seen = fields.Datetime(string='Last Seen')
     metric_ids = fields.One2many('system.monitor.metric', 'computer_id', string='Metrics')
     latest_cpu = fields.Float(compute='_compute_latest_metrics', string='Latest CPU %')
     latest_ram = fields.Float(compute='_compute_latest_metrics', string='Latest RAM %')
+    is_active = fields.Boolean(compute='_compute_is_active', string='Active Status')
 
+    def _compute_is_active(self):
+        """Determine if the computer is active (last_seen within 5 minutes)."""
+        for computer in self:
+            if computer.last_seen:
+                now = fields.Datetime.now()
+                delta = now - computer.last_seen
+                computer.is_active = delta.total_seconds() <= 300  # 5 minutes
+            else:
+                computer.is_active = False
     def _compute_latest_metrics(self):
         for computer in self:
             latest_metric = self.env['system.monitor.metric'].search([
