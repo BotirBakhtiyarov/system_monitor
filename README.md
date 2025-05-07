@@ -28,7 +28,7 @@ The **System Monitor** module is an Odoo 17 module designed to monitor and track
 ### Steps
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/<your-username>/system_monitor.git
+   git clone https://github.com/BotirBakhtiyarov/system_monitor.git
    ```
 
 2. **Copy to Odoo Addons**:
