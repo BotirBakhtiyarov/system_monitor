@@ -1,54 +1,69 @@
 from odoo import http
+from odoo.http import request
+from odoo.exceptions import AccessError
 import json
+import logging
 from datetime import datetime
 
+_logger = logging.getLogger(__name__)
 
 class MetricsController(http.Controller):
-    @http.route('/api/data', type='json', auth='none', methods=['POST'], csrf=False)
+    @http.route('/api/data', type='json', auth='public', methods=['POST'], csrf=False)
     def handle_metrics(self, **kwargs):
-        data = json.loads(http.request.httprequest.data)
+        """
+        Handle incoming system metrics data.
+        Expects JSON payload with computer metrics and application usage.
+        """
+        try:
+            # Parse incoming data
+            data = json.loads(request.httprequest.data.decode('utf-8'))
+            if not data.get('computer_id') or not data.get('timestamp'):
+                return {'status': 'error', 'message': 'Missing required fields'}
 
-        Computer = http.request.env['system.monitor.computer']
-        Metric = http.request.env['system.monitor.metric']
-        App = http.request.env['system.monitor.app']
+            # Initialize models
+            Computer = request.env['system.monitor.computer'].sudo()
+            Metric = request.env['system.monitor.metric'].sudo()
+            App = request.env['system.monitor.app'].sudo()
 
-        # Find or create computer
-        computer = Computer.sudo().search([
-            ('name', '=', data['computer_id'])
-        ], limit=1)
+            # Find or create computer
+            computer = Computer.search([('name', '=', data['computer_id'])], limit=1)
+            if not computer:
+                computer = Computer.create({
+                    'name': data['computer_id'],
+                    'username': data.get('username', ''),
+                })
 
-        if not computer:
-            computer = Computer.sudo().create({
-                'name': data['computer_id'],
-                'username': data['username']
+            # Update last seen
+            computer.write({'last_seen': fields.Datetime.now()})
+
+            # Create metric record
+            metric = Metric.create({
+                'computer_id': computer.id,
+                'timestamp': datetime.fromisoformat(data['timestamp']).strftime('%Y-%m-%d %H:%M:%S'),
+                'cpu_percent': float(data.get('cpu', 0)),
+                'ram_total': data.get('ram', {}).get('total', 0) / (1024 ** 2),
+                'ram_used': data.get('ram', {}).get('used', 0) / (1024 ** 2),
+                'ram_percent': float(data.get('ram', {}).get('percent', 0)),
             })
 
-        # Update last seen
-        computer.sudo().write({
-            'last_seen': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        })
+            # Create application records
+            apps = []
+            for app_name, app_data in data.get('apps', {}).items():
+                apps.append({
+                    'metric_id': metric.id,
+                    'name': app_name,
+                    'duration': int(app_data.get('duration', 0)),
+                    'cpu_usage': float(app_data.get('cpu', 0)),
+                    'ram_usage': float(app_data.get('ram', 0)) / (1024 ** 2),
+                })
+            if apps:
+                App.create(apps)
 
-        # Create metric record
-        metric = Metric.sudo().create({
-            'computer_id': computer.id,
-            'timestamp': datetime.fromisoformat(data['timestamp']).strftime('%Y-%m-%d %H:%M:%S'),
-            'cpu_percent': data['cpu'],
-            'ram_total': data['ram']['total'] / (1024 ** 2),  # Convert bytes to MB
-            'ram_used': data['ram']['used'] / (1024 ** 2),
-            'ram_percent': data['ram']['percent'],
-        })
+            return {'status': 'success', 'message': 'Metrics recorded successfully'}
 
-        # Create application records
-        apps = []
-        for app_name, app_data in data['apps'].items():
-            apps.append({
-                'metric_id': metric.id,
-                'name': app_name,
-                'duration': app_data['duration'],
-                'cpu_usage': app_data['cpu'],
-                'ram_usage': app_data['ram']
-            })
-
-        App.sudo().create(apps)
-
-        return {'status': 'success'}
+        except (ValueError, KeyError, TypeError) as e:
+            _logger.error(f"Error processing metrics: {str(e)}")
+            return {'status': 'error', 'message': f'Invalid data format: {str(e)}'}
+        except Exception as e:
+            _logger.exception("Unexpected error in metrics controller")
+            return {'status': 'error', 'message': 'Internal server error'}

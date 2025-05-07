@@ -1,11 +1,18 @@
 {
     'name': 'System Monitor',
-    'version': '1.0',
-    'summary': 'System Monitoring Integration',
+    'version': '2.0',
+    'summary': 'Advanced System Monitoring Integration',
     'sequence': 10,
-    'description': "Integration with system monitoring agent",
+    'description': """
+        Advanced system monitoring module for tracking computer metrics and application usage.
+        Features:
+        - Real-time system metrics collection
+        - Computer activity tracking
+        - Application usage monitoring
+        - Comprehensive visualization dashboards
+    """,
     'category': 'Tools',
-    'author':'Nick',
+    'author': 'Nick',
     'depends': ['base', 'web'],
     'data': [
         'security/ir.model.access.csv',
@@ -14,5 +21,6 @@
     ],
     'installable': True,
     'application': True,
+    'auto_install': False,
     'license': 'LGPL-3',
 }
